@@ -1,3 +1,5 @@
 .coverage
 .env
 *.pyc
+collection_json.egg-info/
+dist/
