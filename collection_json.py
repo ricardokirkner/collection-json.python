@@ -74,6 +74,10 @@ class Collection(ComparableObject):
             queries = []
         self.queries = Array(Query, 'queries', queries)
 
+    def __repr__(self):
+        return "<Collection: version='%s' href='%s'>" % (
+            self.version, self.href)
+
     def to_dict(self):
         """Return a dictionary representing a Collection object."""
         output = {
@@ -104,6 +108,16 @@ class Error(ComparableObject):
         self.message = message
         self.title = title
 
+    def __repr__(self):
+        data = ''
+        if self.code is not None:
+            data += " code='%s'" % self.code
+        if self.message is not None:
+            data += " message='%s'" % self.message
+        if self.title is not None:
+            data += " title='%s'" % self.title
+        return "<Error%s>" % data
+
     def to_dict(self):
         """Return a dictionary representing the Error instance."""
         output = {
@@ -127,6 +141,10 @@ class Template(ComparableObject):
         if data is None:
             data = []
         self.data = Array(Data, 'data', data)
+
+    def __repr__(self):
+        data = [str(item.name) for item in self.data]
+        return "<Template: data=%s>" % data
 
     def to_dict(self):
         """Return a dictionary representing a Template object."""
@@ -220,7 +238,7 @@ class Item(ComparableObject):
         self.links = Array(Link, 'links', links)
 
     def __repr__(self):
-        return '<Item>'
+        return "<Item: href='%s'>" % self.href
 
     def to_dict(self):
         """Return a dictionary representing an Item object."""
@@ -244,7 +262,10 @@ class Data(ComparableObject):
         self.prompt = prompt
 
     def __repr__(self):
-        return "<Data: %s>" % self.name
+        data = "name='%s'" % self.name
+        if self.prompt is not None:
+            data += " prompt='%s'" % self.prompt
+        return "<Data: %s>" % data
 
     def to_dict(self):
         """Return a dictionary representing a Data object."""
@@ -275,6 +296,8 @@ class Query(ComparableObject):
         data = "rel='%s'" % self.rel
         if self.name:
             data += " name='%s'" % self.name
+        if self.prompt:
+            data += " prompt='%s'" % self.prompt
         return "<Query: %s>" % data
 
     def to_dict(self):
@@ -309,6 +332,8 @@ class Link(ComparableObject):
             data += " name='%s'" % self.name
         if self.render:
             data += " render='%s'" % self.render
+        if self.prompt:
+            data += " prompt='%s'" % self.prompt
         return "<Link: %s>" % data
 
     def to_dict(self):

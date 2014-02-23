@@ -314,6 +314,12 @@ class CollectionTestCase(TestCase):
         }
         self.assertEqual(collection.to_dict(), expected)
 
+    def test_repr(self):
+        collection = Collection('href')
+        self.assertEqual(
+            repr(collection),
+            "<Collection: version='1.0' href='href'>")
+
 
 class ErrorTestCase(TestCase):
 
@@ -363,6 +369,28 @@ class ErrorTestCase(TestCase):
         self.assertTrue(error.__ne__(other))
         self.assertTrue(other.__ne__(error))
 
+    def test_repr_minimal(self):
+        error = Error()
+        self.assertEqual(repr(error), '<Error>')
+
+    def test_repr_with_code(self):
+        error = Error(code='code')
+        self.assertEqual(repr(error), "<Error code='code'>")
+
+    def test_repr_with_message(self):
+        error = Error(message='message')
+        self.assertEqual(repr(error), "<Error message='message'>")
+
+    def test_repr_with_title(self):
+        error = Error(title='title')
+        self.assertEqual(repr(error), "<Error title='title'>")
+
+    def test_repr_full(self):
+        error = Error('code', 'message', 'title')
+        self.assertEqual(
+            repr(error),
+            "<Error code='code' message='message' title='title'>")
+
 
 class TemplateTestCase(TestCase):
 
@@ -396,6 +424,15 @@ class TemplateTestCase(TestCase):
         }
         self.assertEqual(template.to_dict(), expected)
 
+    def test_repr_minimal(self):
+        template = Template()
+        self.assertEqual(repr(template), "<Template: data=[]>")
+
+    def test_repr_with_data(self):
+        data = [Data('name')]
+        template = Template(data)
+        self.assertEqual(repr(template), "<Template: data=['name']>")
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
@@ -416,7 +453,7 @@ class ItemTestCase(TestCase):
         data = [Data('name')]
         links = [Link('href', 'rel')]
         item = Item('href', data, links)
-        expected = '<Item>'
+        expected = "<Item: href='href'>"
         self.assertEqual(repr(item), expected)
 
     def test_to_dict_minimal(self):
@@ -455,7 +492,7 @@ class DataTestCase(TestCase):
 
     def test_repr(self):
         data = Data('name', 'value', 'prompt')
-        expected = '<Data: name>'
+        expected = "<Data: name='name' prompt='prompt'>"
         self.assertEqual(repr(data), expected)
 
     def test_to_dict_minimal(self):
@@ -473,6 +510,14 @@ class DataTestCase(TestCase):
             'prompt': 'prompt',
         }
         self.assertEqual(data.to_dict(), expected)
+
+    def test_repr_minimal(self):
+        data = Data('name')
+        self.assertEqual(repr(data), "<Data: name='name'>")
+
+    def test_repr_with_prompt(self):
+        data = Data('name', prompt='prompt')
+        self.assertEqual(repr(data), "<Data: name='name' prompt='prompt'>")
 
 
 class QueryTestCase(TestCase):
@@ -500,8 +545,14 @@ class QueryTestCase(TestCase):
 
     def test_repr_with_name(self):
         data = [Data('name')]
-        query = Query('href', 'rel', 'name', 'prompt', data)
+        query = Query('href', 'rel', 'name', data=data)
         expected = "<Query: rel='rel' name='name'>"
+        self.assertEqual(repr(query), expected)
+
+    def test_repr_with_prompt(self):
+        data = [Data('name')]
+        query = Query('href', 'rel', 'name', 'prompt', data)
+        expected = "<Query: rel='rel' name='name' prompt='prompt'>"
         self.assertEqual(repr(query), expected)
 
     def test_to_dict_minimal(self):
@@ -561,7 +612,8 @@ class LinkTestCase(TestCase):
 
     def test_repr_full(self):
         link = Link('href', 'rel', 'name', 'render', 'prompt')
-        expected = "<Link: rel='rel' name='name' render='render'>"
+        expected = ("<Link: rel='rel' name='name' "
+                    "render='render' prompt='prompt'>")
         self.assertEqual(repr(link), expected)
 
     def test_to_dict_minimal(self):
