@@ -129,6 +129,20 @@ class CollectionTestCase(TestCase):
         query = Query('href', 'rel')
         self.assertEqual(collection.queries, Array(Query, 'queries', [query]))
 
+    def test_collection_required_parameters(self):
+        with self.assertRaises(TypeError):
+            Collection()
+
+    def test_collection_defaults(self):
+        collection = Collection('href')
+        self.assertEqual(collection.version, '1.0')
+        self.assertEqual(collection.href, 'href')
+        self.assertEqual(collection.error, None)
+        self.assertEqual(collection.template, None)
+        self.assertEqual(collection.items, Array(Item, 'items', []))
+        self.assertEqual(collection.links, Array(Link, 'links', []))
+        self.assertEqual(collection.queries, Array(Query, 'queries', []))
+
     def test_to_dict_minimal(self):
         collection = Collection(
             href='http://example.com')

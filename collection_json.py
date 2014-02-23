@@ -38,8 +38,8 @@ class Collection(BaseObject):
         collection = Collection(**kwargs)
         return collection
 
-    def __init__(self, version='1.0', href=None, links=None, items=None,
-                 queries=None, template=None, error=None):
+    def __init__(self, href, links=None, items=None, queries=None,
+                 template=None, error=None, version='1.0'):
         self.version = version
         self.href = href
 
