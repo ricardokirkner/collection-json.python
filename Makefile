@@ -18,5 +18,8 @@ test:
 coverage:
 	@nosetests -vs --with-coverage --cover-package=collection_json --cover-branches
 
+lint:
+	@flake8 --statistics collection_json.py tests.py
 
-.PHONY: env clean distclean test coverage
+
+.PHONY: env clean distclean test coverage lint
