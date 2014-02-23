@@ -1,3 +1,6 @@
-.coverage
 .env
+.tox
 *.pyc
+collection_json.egg-info/
+dist/
+.coverage

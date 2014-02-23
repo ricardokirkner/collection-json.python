@@ -1,12 +1,18 @@
+"""Classes for representing a Collection+JSON document."""
 from __future__ import absolute_import, unicode_literals
 import json
 
 
-__all__ = ['Collection']
 __version__ = '0.0.1dev'
 
 
-class BaseObject(object):
+class ComparableObject(object):
+
+    """Abstract base class for objects implementing equality comparison.
+
+    This class provides default __eq__ and __ne__ implementations.
+
+    """
 
     def __eq__(self, other):
         """Return True if both instances are equivalent."""
@@ -19,10 +25,15 @@ class BaseObject(object):
                 self.__dict__ != other.__dict__)
 
 
-class Collection(BaseObject):
+class Collection(ComparableObject):
+
+    """Object representing a Collection+JSON document."""
+
     @staticmethod
     def from_json(data):
         """Return a Collection instance.
+
+        This method parses a json string into a Collection object.
 
         Raises `ValueError` when no valid document is provided.
 
@@ -38,8 +49,8 @@ class Collection(BaseObject):
         collection = Collection(**kwargs)
         return collection
 
-    def __init__(self, version='1.0', href=None, links=None, items=None,
-                 queries=None, template=None, error=None):
+    def __init__(self, href, links=None, items=None, queries=None,
+                 template=None, error=None, version='1.0'):
         self.version = version
         self.href = href
 
@@ -63,7 +74,12 @@ class Collection(BaseObject):
             queries = []
         self.queries = Array(Query, 'queries', queries)
 
+    def __repr__(self):
+        return "<Collection: version='%s' href='%s'>" % (
+            self.version, self.href)
+
     def to_dict(self):
+        """Return a dictionary representing a Collection object."""
         output = {
             'collection': {
                 'version': self.version,
@@ -83,12 +99,24 @@ class Collection(BaseObject):
         return output
 
 
-class Error(BaseObject):
+class Error(ComparableObject):
+
+    """Object representing a Collection+JSON error object."""
 
     def __init__(self, code=None, message=None, title=None):
         self.code = code
         self.message = message
         self.title = title
+
+    def __repr__(self):
+        data = ''
+        if self.code is not None:
+            data += " code='%s'" % self.code
+        if self.message is not None:
+            data += " message='%s'" % self.message
+        if self.title is not None:
+            data += " title='%s'" % self.title
+        return "<Error%s>" % data
 
     def to_dict(self):
         """Return a dictionary representing the Error instance."""
@@ -105,19 +133,37 @@ class Error(BaseObject):
         return output
 
 
-class Template(BaseObject):
+class Template(ComparableObject):
+
+    """Object representing a Collection+JSON template object."""
+
     def __init__(self, data=None):
         if data is None:
             data = []
         self.data = Array(Data, 'data', data)
 
+    def __repr__(self):
+        data = [str(item.name) for item in self.data]
+        return "<Template: data=%s>" % data
+
+    def __getattr__(self, name):
+        return getattr(self.data, name)
+
+    @property
+    def properties(self):
+        return [item.name for item in self.data]
+
     def to_dict(self):
+        """Return a dictionary representing a Template object."""
         return {
             'template': self.data.to_dict()
         }
 
 
-class Array(BaseObject, list):
+class Array(ComparableObject, list):
+
+    """Object representing a Collection+JSON array."""
+
     def __init__(self, item_class, collection_name, items):
         self.item_class = item_class
         self.collection_name = collection_name
@@ -145,13 +191,50 @@ class Array(BaseObject, list):
         return (super(Array, self).__ne__(other) or
                 list.__ne__(self, other))
 
+    def __getattr__(self, name):
+        results = self.find(name=name)
+
+        if not results:
+            raise AttributeError
+        elif len(results) == 1:
+            results = results[0]
+        return results
+
+    def find(self, name=None, rel=None):
+        """Return a list of items in the array matching name and/or rel.
+
+        If both name and rel parameters are provided, returned items must match
+        both properties.
+
+        """
+        results = []
+        for item in self:
+            item_name = getattr(item, 'name', None)
+            item_rel = getattr(item, 'rel', None)
+
+            if name is not None and item_name == name and rel is None:
+                # only searching by name
+                results.append(item)
+            elif rel is not None and item_rel == rel and name is None:
+                # only searching by rel
+                results.append(item)
+            elif item_name == name and item_rel == rel:
+                # searching by name and rel
+                results.append(item)
+
+        return results
+
     def to_dict(self):
+        """Return a dictionary representing an Array object."""
         return {
             self.collection_name: [item.to_dict() for item in self]
         }
 
 
-class Item(BaseObject):
+class Item(ComparableObject):
+
+    """Object representing a Collection+JSON item object."""
+
     def __init__(self, href=None, data=None, links=None):
         self.href = href
         if data is None:
@@ -162,9 +245,17 @@ class Item(BaseObject):
         self.links = Array(Link, 'links', links)
 
     def __repr__(self):
-        return '<Item>'
+        return "<Item: href='%s'>" % self.href
+
+    def __getattr__(self, name):
+        return getattr(self.data, name)
+
+    @property
+    def properties(self):
+        return [item.name for item in self.data]
 
     def to_dict(self):
+        """Return a dictionary representing an Item object."""
         output = {}
         if self.href:
             output['href'] = self.href
@@ -175,16 +266,23 @@ class Item(BaseObject):
         return output
 
 
-class Data(BaseObject):
+class Data(ComparableObject):
+
+    """Object representing a Collection+JSON data object."""
+
     def __init__(self, name, value=None, prompt=None):
         self.name = name
         self.value = value
         self.prompt = prompt
 
     def __repr__(self):
-        return "<Data: %s>" % self.name
+        data = "name='%s'" % self.name
+        if self.prompt is not None:
+            data += " prompt='%s'" % self.prompt
+        return "<Data: %s>" % data
 
     def to_dict(self):
+        """Return a dictionary representing a Data object."""
         output = {
             'name': self.name
         }
@@ -195,7 +293,10 @@ class Data(BaseObject):
         return output
 
 
-class Query(BaseObject):
+class Query(ComparableObject):
+
+    """Object representing a Collection+JSON query object."""
+
     def __init__(self, href, rel, name=None, prompt=None, data=None):
         self.href = href
         self.rel = rel
@@ -209,9 +310,12 @@ class Query(BaseObject):
         data = "rel='%s'" % self.rel
         if self.name:
             data += " name='%s'" % self.name
+        if self.prompt:
+            data += " prompt='%s'" % self.prompt
         return "<Query: %s>" % data
 
     def to_dict(self):
+        """Return a dictionary representing a Query object."""
         output = {
             'href': self.href,
             'rel': self.rel,
@@ -225,7 +329,10 @@ class Query(BaseObject):
         return output
 
 
-class Link(BaseObject):
+class Link(ComparableObject):
+
+    """Object representing a Collection+JSON link object."""
+
     def __init__(self, href, rel, name=None, render=None, prompt=None):
         self.href = href
         self.rel = rel
@@ -239,9 +346,12 @@ class Link(BaseObject):
             data += " name='%s'" % self.name
         if self.render:
             data += " render='%s'" % self.render
+        if self.prompt:
+            data += " prompt='%s'" % self.prompt
         return "<Link: %s>" % data
 
     def to_dict(self):
+        """Return a dictionary representing a Link object."""
         output = {
             'href': self.href,
             'rel': self.rel,

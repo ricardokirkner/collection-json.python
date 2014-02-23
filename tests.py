@@ -129,6 +129,20 @@ class CollectionTestCase(TestCase):
         query = Query('href', 'rel')
         self.assertEqual(collection.queries, Array(Query, 'queries', [query]))
 
+    def test_collection_required_parameters(self):
+        with self.assertRaises(TypeError):
+            Collection()
+
+    def test_collection_defaults(self):
+        collection = Collection('href')
+        self.assertEqual(collection.version, '1.0')
+        self.assertEqual(collection.href, 'href')
+        self.assertEqual(collection.error, None)
+        self.assertEqual(collection.template, None)
+        self.assertEqual(collection.items, Array(Item, 'items', []))
+        self.assertEqual(collection.links, Array(Link, 'links', []))
+        self.assertEqual(collection.queries, Array(Query, 'queries', []))
+
     def test_to_dict_minimal(self):
         collection = Collection(
             href='http://example.com')
@@ -300,6 +314,12 @@ class CollectionTestCase(TestCase):
         }
         self.assertEqual(collection.to_dict(), expected)
 
+    def test_repr(self):
+        collection = Collection('href')
+        self.assertEqual(
+            repr(collection),
+            "<Collection: version='1.0' href='href'>")
+
 
 class ErrorTestCase(TestCase):
 
@@ -349,6 +369,28 @@ class ErrorTestCase(TestCase):
         self.assertTrue(error.__ne__(other))
         self.assertTrue(other.__ne__(error))
 
+    def test_repr_minimal(self):
+        error = Error()
+        self.assertEqual(repr(error), '<Error>')
+
+    def test_repr_with_code(self):
+        error = Error(code='code')
+        self.assertEqual(repr(error), "<Error code='code'>")
+
+    def test_repr_with_message(self):
+        error = Error(message='message')
+        self.assertEqual(repr(error), "<Error message='message'>")
+
+    def test_repr_with_title(self):
+        error = Error(title='title')
+        self.assertEqual(repr(error), "<Error title='title'>")
+
+    def test_repr_full(self):
+        error = Error('code', 'message', 'title')
+        self.assertEqual(
+            repr(error),
+            "<Error code='code' message='message' title='title'>")
+
 
 class TemplateTestCase(TestCase):
 
@@ -382,6 +424,29 @@ class TemplateTestCase(TestCase):
         }
         self.assertEqual(template.to_dict(), expected)
 
+    def test_repr_minimal(self):
+        template = Template()
+        self.assertEqual(repr(template), "<Template: data=[]>")
+
+    def test_repr_with_data(self):
+        data = [Data('name')]
+        template = Template(data)
+        self.assertEqual(repr(template), "<Template: data=['name']>")
+
+    def test_properties_minimal(self):
+        template = Template()
+        self.assertEqual(template.properties, [])
+
+    def test_properties(self):
+        data = [Data('name'), Data('other')]
+        template = Template(data)
+        self.assertEqual(template.properties, ['name', 'other'])
+
+    def test_attribute_lookup(self):
+        data = Data('name')
+        template = Template([data])
+        self.assertEqual(template.name, data)
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
@@ -402,7 +467,7 @@ class ItemTestCase(TestCase):
         data = [Data('name')]
         links = [Link('href', 'rel')]
         item = Item('href', data, links)
-        expected = '<Item>'
+        expected = "<Item: href='href'>"
         self.assertEqual(repr(item), expected)
 
     def test_to_dict_minimal(self):
@@ -425,6 +490,20 @@ class ItemTestCase(TestCase):
         }
         self.assertEqual(item.to_dict(), expected)
 
+    def test_properties_minimal(self):
+        item = Item()
+        self.assertEqual(item.properties, [])
+
+    def test_properties(self):
+        data = [Data('name'), Data('other')]
+        item = Item(data=data)
+        self.assertEqual(item.properties, ['name', 'other'])
+
+    def test_attribute_lookup(self):
+        data = Data('name')
+        item = Item(data=[data])
+        self.assertEqual(item.name, data)
+
 
 class DataTestCase(TestCase):
     def test_data_minimal(self):
@@ -441,7 +520,7 @@ class DataTestCase(TestCase):
 
     def test_repr(self):
         data = Data('name', 'value', 'prompt')
-        expected = '<Data: name>'
+        expected = "<Data: name='name' prompt='prompt'>"
         self.assertEqual(repr(data), expected)
 
     def test_to_dict_minimal(self):
@@ -459,6 +538,14 @@ class DataTestCase(TestCase):
             'prompt': 'prompt',
         }
         self.assertEqual(data.to_dict(), expected)
+
+    def test_repr_minimal(self):
+        data = Data('name')
+        self.assertEqual(repr(data), "<Data: name='name'>")
+
+    def test_repr_with_prompt(self):
+        data = Data('name', prompt='prompt')
+        self.assertEqual(repr(data), "<Data: name='name' prompt='prompt'>")
 
 
 class QueryTestCase(TestCase):
@@ -486,8 +573,14 @@ class QueryTestCase(TestCase):
 
     def test_repr_with_name(self):
         data = [Data('name')]
-        query = Query('href', 'rel', 'name', 'prompt', data)
+        query = Query('href', 'rel', 'name', data=data)
         expected = "<Query: rel='rel' name='name'>"
+        self.assertEqual(repr(query), expected)
+
+    def test_repr_with_prompt(self):
+        data = [Data('name')]
+        query = Query('href', 'rel', 'name', 'prompt', data)
+        expected = "<Query: rel='rel' name='name' prompt='prompt'>"
         self.assertEqual(repr(query), expected)
 
     def test_to_dict_minimal(self):
@@ -547,7 +640,8 @@ class LinkTestCase(TestCase):
 
     def test_repr_full(self):
         link = Link('href', 'rel', 'name', 'render', 'prompt')
-        expected = "<Link: rel='rel' name='name' render='render'>"
+        expected = ("<Link: rel='rel' name='name' "
+                    "render='render' prompt='prompt'>")
         self.assertEqual(repr(link), expected)
 
     def test_to_dict_minimal(self):
@@ -592,3 +686,59 @@ class ArrayTestCase(TestCase):
         array1 = Array(dict, 'items', [{1: 1}])
         list1 = [{1: 1}]
         self.assertNotEqual(array1, list1)
+
+    def test_find_by_rel(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='foo'), [link])
+
+    def test_find_by_rel_not_found(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='bar'), [])
+
+    def test_find_by_rel_multiple_values(self):
+        link1 = Link('href1', rel='foo')
+        link2 = Link('href2', rel='foo')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.find(rel='foo'), [link1, link2])
+
+    def test_find_by_name(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='foo'), [link])
+        self.assertEqual(links.find(name='bar'), [link])
+
+    def test_find_by_name_not_found(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(name='foo'), [])
+
+    def test_find_by_name_multiple_values(self):
+        link1 = Link('href1', rel='foo', name='bar')
+        link2 = Link('href2', rel='foo', name='bar')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.find(name='bar'), [link1, link2])
+
+    def test_find_by_rel_and_name(self):
+        foo = Link('href', rel='foo', name='bar')
+        bar = Link('href', rel='bar')
+        links = Array(Link, 'links', [foo, bar])
+        self.assertEqual(links.find(rel='foo', name='bar'), [foo])
+        self.assertEqual(links.find(rel='bar', name='foo'), [])
+
+    def test_attribute_lookup_by_name(self):
+        foo = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [foo])
+        self.assertEqual(links.bar, foo)
+
+    def test_attribute_lookup_by_name_not_found(self):
+        links = Array(Link, 'links', [])
+        with self.assertRaises(AttributeError):
+            links.foo
+
+    def test_attribute_lookup_by_name_multiple_values(self):
+        foo = Link('href1', rel='bar', name='foo')
+        bar = Link('href2', rel='baz', name='foo')
+        links = Array(Link, 'links', [foo, bar])
+        self.assertEqual(links.foo, [foo, bar])
