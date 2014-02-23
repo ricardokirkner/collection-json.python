@@ -146,6 +146,10 @@ class Template(ComparableObject):
         data = [str(item.name) for item in self.data]
         return "<Template: data=%s>" % data
 
+    @property
+    def properties(self):
+        return [item.name for item in self.data]
+
     def to_dict(self):
         """Return a dictionary representing a Template object."""
         return {
@@ -239,6 +243,10 @@ class Item(ComparableObject):
 
     def __repr__(self):
         return "<Item: href='%s'>" % self.href
+
+    @property
+    def properties(self):
+        return [item.name for item in self.data]
 
     def to_dict(self):
         """Return a dictionary representing an Item object."""

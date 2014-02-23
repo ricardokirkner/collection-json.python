@@ -433,6 +433,15 @@ class TemplateTestCase(TestCase):
         template = Template(data)
         self.assertEqual(repr(template), "<Template: data=['name']>")
 
+    def test_properties_minimal(self):
+        template = Template()
+        self.assertEqual(template.properties, [])
+
+    def test_properties(self):
+        data = [Data('name'), Data('other')]
+        template = Template(data)
+        self.assertEqual(template.properties, ['name', 'other'])
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
@@ -475,6 +484,15 @@ class ItemTestCase(TestCase):
             ]
         }
         self.assertEqual(item.to_dict(), expected)
+
+    def test_properties_minimal(self):
+        item = Item()
+        self.assertEqual(item.properties, [])
+
+    def test_properties(self):
+        data = [Data('name'), Data('other')]
+        item = Item(data=data)
+        self.assertEqual(item.properties, ['name', 'other'])
 
 
 class DataTestCase(TestCase):
