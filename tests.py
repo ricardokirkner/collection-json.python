@@ -592,3 +592,43 @@ class ArrayTestCase(TestCase):
         array1 = Array(dict, 'items', [{1: 1}])
         list1 = [{1: 1}]
         self.assertNotEqual(array1, list1)
+
+    def test_find_by_rel(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='foo'), [link])
+
+    def test_find_by_rel_not_found(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='bar'), [])
+
+    def test_find_by_rel_multiple_values(self):
+        link1 = Link('href1', rel='foo')
+        link2 = Link('href2', rel='foo')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.find(rel='foo'), [link1, link2])
+
+    def test_find_by_name(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(rel='foo'), [link])
+        self.assertEqual(links.find(name='bar'), [link])
+
+    def test_find_by_name_not_found(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.find(name='foo'), [])
+
+    def test_find_by_name_multiple_values(self):
+        link1 = Link('href1', rel='foo', name='bar')
+        link2 = Link('href2', rel='foo', name='bar')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.find(name='bar'), [link1, link2])
+
+    def test_find_by_rel_and_name(self):
+        foo = Link('href', rel='foo', name='bar')
+        bar = Link('href', rel='bar')
+        links = Array(Link, 'links', [foo, bar])
+        self.assertEqual(links.find(rel='foo', name='bar'), [foo])
+        self.assertEqual(links.find(rel='bar', name='foo'), [])

@@ -145,6 +145,22 @@ class Array(BaseObject, list):
         return (super(Array, self).__ne__(other) or
                 list.__ne__(self, other))
 
+    def find(self, rel=None, name=None):
+        results = []
+        for item in self:
+            item_rel = getattr(item, 'rel')
+            item_name = getattr(item, 'name')
+
+            if rel is not None and item_rel == rel:
+                if name is not None and item_name != name:
+                    # skip because name doesn't match
+                    continue
+                results.append(item)
+            elif name is not None and item_name == name:
+                results.append(item)
+
+        return results
+
     def to_dict(self):
         return {
             self.collection_name: [item.to_dict() for item in self]
