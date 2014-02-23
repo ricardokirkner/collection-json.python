@@ -632,3 +632,19 @@ class ArrayTestCase(TestCase):
         links = Array(Link, 'links', [foo, bar])
         self.assertEqual(links.find(rel='foo', name='bar'), [foo])
         self.assertEqual(links.find(rel='bar', name='foo'), [])
+
+    def test_attribute_lookup_by_name(self):
+        foo = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [foo])
+        self.assertEqual(links.bar, foo)
+
+    def test_attribute_lookup_by_name_not_found(self):
+        links = Array(Link, 'links', [])
+        with self.assertRaises(AttributeError):
+            links.foo
+
+    def test_attribute_lookup_by_name_multiple_values(self):
+        foo = Link('href1', rel='bar', name='foo')
+        bar = Link('href2', rel='baz', name='foo')
+        links = Array(Link, 'links', [foo, bar])
+        self.assertEqual(links.foo, [foo, bar])

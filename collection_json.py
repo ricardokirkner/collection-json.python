@@ -145,18 +145,29 @@ class Array(BaseObject, list):
         return (super(Array, self).__ne__(other) or
                 list.__ne__(self, other))
 
-    def find(self, rel=None, name=None):
+    def __getattr__(self, name):
+        results = self.find(name=name)
+
+        if not results:
+            raise AttributeError
+        elif len(results) == 1:
+            results = results[0]
+        return results
+
+    def find(self, name=None, rel=None):
         results = []
         for item in self:
-            item_rel = getattr(item, 'rel')
             item_name = getattr(item, 'name')
+            item_rel = getattr(item, 'rel')
 
-            if rel is not None and item_rel == rel:
-                if name is not None and item_name != name:
-                    # skip because name doesn't match
-                    continue
+            if name is not None and item_name == name and rel is None:
+                # only searching by name
                 results.append(item)
-            elif name is not None and item_name == name:
+            elif rel is not None and item_rel == rel and name is None:
+                # only searching by rel
+                results.append(item)
+            elif item_name == name and item_rel == rel:
+                # searching by name and rel
                 results.append(item)
 
         return results
