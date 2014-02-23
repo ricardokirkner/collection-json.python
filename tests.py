@@ -442,6 +442,11 @@ class TemplateTestCase(TestCase):
         template = Template(data)
         self.assertEqual(template.properties, ['name', 'other'])
 
+    def test_attribute_lookup(self):
+        data = Data('name')
+        template = Template([data])
+        self.assertEqual(template.name, data)
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
@@ -493,6 +498,11 @@ class ItemTestCase(TestCase):
         data = [Data('name'), Data('other')]
         item = Item(data=data)
         self.assertEqual(item.properties, ['name', 'other'])
+
+    def test_attribute_lookup(self):
+        data = Data('name')
+        item = Item(data=[data])
+        self.assertEqual(item.name, data)
 
 
 class DataTestCase(TestCase):

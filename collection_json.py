@@ -146,6 +146,9 @@ class Template(ComparableObject):
         data = [str(item.name) for item in self.data]
         return "<Template: data=%s>" % data
 
+    def __getattr__(self, name):
+        return getattr(self.data, name)
+
     @property
     def properties(self):
         return [item.name for item in self.data]
@@ -206,8 +209,8 @@ class Array(ComparableObject, list):
         """
         results = []
         for item in self:
-            item_name = getattr(item, 'name')
-            item_rel = getattr(item, 'rel')
+            item_name = getattr(item, 'name', None)
+            item_rel = getattr(item, 'rel', None)
 
             if name is not None and item_name == name and rel is None:
                 # only searching by name
@@ -243,6 +246,9 @@ class Item(ComparableObject):
 
     def __repr__(self):
         return "<Item: href='%s'>" % self.href
+
+    def __getattr__(self, name):
+        return getattr(self.data, name)
 
     @property
     def properties(self):
