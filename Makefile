@@ -16,7 +16,7 @@ test:
 	@nosetests -vs
 
 coverage:
-	@nosetests -vs --with-coverage --cover-package=collection_json --cover-branches
+	@nosetests -vs --with-coverage --cover-package=collection_json --cover-erase --cover-branches
 
 lint:
 	@flake8 --statistics collection_json.py tests.py

@@ -3,6 +3,9 @@ python:
   - "2.7"
   - "3.3"
 install:
-  - "pip install ."
-  - "pip install -r requirements.txt"
-script: nosetests
+  - pip install -r requirements.txt
+  - pip install coveralls
+script:
+  - make test
+  - make coverage
+after_success: coveralls
