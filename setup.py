@@ -27,4 +27,5 @@ setup(
     long_description=open('README.txt').read(),
     license='BSD',
     classifiers=classifiers,
+    test_suite='tests',
 )

@@ -7,16 +7,18 @@ env:
 	@pip install -r requirements.txt
 
 clean:
-	@rm .coverage
+	@coverage erase
+	@find . -name '*.pyc' -delete
 
 distclean:
 	@rm -rf $(ENV_PATH)
 
 test:
-	@nosetests -vs
+	@python setup.py test
 
 coverage:
-	@nosetests -vs --with-coverage --cover-package=collection_json --cover-erase --cover-branches
+	@coverage run --source=collection_json --branch setup.py test
+	@coverage report -m
 
 lint:
 	@flake8 --statistics collection_json.py tests.py
