@@ -1,0 +1,30 @@
+.. collection-json documentation master file, created by
+   sphinx-quickstart on Sun Feb 23 18:59:24 2014.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to collection-json's documentation!
+===========================================
+
+Release v\ |version|. (:ref:`Changelog`)
+
+`collection-json` is a Python (2 and 3) library for working with Collection+JSON documents.
+
+Guide
+=====
+
+.. toctree::
+   :maxdepth: 2
+
+   license
+   install
+   examples
+   api_reference
+
+Project info
+============
+
+.. toctree::
+   :maxdepth: 1
+
+   changelog

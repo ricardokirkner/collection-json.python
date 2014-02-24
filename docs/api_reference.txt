@@ -1,0 +1,7 @@
+API Reference
+=============
+
+.. automodule:: collection_json
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -4,7 +4,7 @@ PATH := $(ENV_PATH)/bin:${PATH}
 
 env:
 	@virtualenv $(ENV_PATH)
-	@pip install -r requirements.txt
+	@pip install -r requirements-dev.txt
 
 clean:
 	@coverage erase
@@ -23,5 +23,8 @@ coverage:
 lint:
 	@flake8 --statistics collection_json.py tests.py
 
+docs:
+	@$(MAKE) -C docs html
 
-.PHONY: env clean distclean test coverage lint
+
+.PHONY: env clean distclean test coverage lint docs
