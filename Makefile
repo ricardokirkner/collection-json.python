@@ -4,7 +4,7 @@ PATH := $(ENV_PATH)/bin:${PATH}
 
 env:
 	@virtualenv $(ENV_PATH)
-	@pip install -r requirements.txt
+	@pip install -r requirements-dev.txt
 
 clean:
 	@coverage erase
