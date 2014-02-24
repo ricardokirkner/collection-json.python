@@ -151,6 +151,7 @@ class Template(ComparableObject):
 
     @property
     def properties(self):
+        """Return a list of names that can be looked up on the template."""
         return [item.name for item in self.data]
 
     def to_dict(self):
@@ -252,6 +253,7 @@ class Item(ComparableObject):
 
     @property
     def properties(self):
+        """Return a list of names that can be looked up on the template."""
         return [item.name for item in self.data]
 
     def to_dict(self):
