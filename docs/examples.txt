@@ -1,0 +1,99 @@
+
+Example usage
+=============
+
+Parse a json document into a Collection object
+
+.. code-block:: python
+
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
+    >>> collection = Collection.from_json(data)
+    >>> collection
+    <Collection: version='1.0' href='...'>
+
+Serialize a Collection object into a dictionary
+
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
+    >>> collection = Collection.from_json(data)
+    >>> collection.to_dict()
+    {'collection': {'href': '...', 'version': '1.0'}}
+
+Inspect collection properties
+
+.. code-block:: python
+
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
+    >>> collection = Collection.from_json(data)
+    >>> collection.version
+    '1.0'
+    >>> collection.href
+    '...'
+    >>> collection.error is None
+    True
+    >>> collection.template is None
+    True
+    >>> collection.items
+    []
+    >>> collection.links
+    []
+    >>> collection.queries
+    []
+
+Inspecting an error
+
+.. code-block:: python
+
+    >>> from collection_json import Collection
+    >>> error = {'code': '1234', 'message': 'Something bad happened.', 'title': 'Error 1234'}
+    >>> collection = Collection('...', error=error)
+    >>> collection.error
+    <Error: code='1234' message='Something bad happened.' title='Error 1234'>
+    >>> collection.error.code
+    '1234'
+
+Inspecting a template
+
+.. code-block:: python
+
+    >>> from collection_json import Collection
+    >>> template = {'data': [
+    ...     {'name': 'first_name', 'value': '', 'prompt': 'First name'},
+    ...     {'name': 'last_name', 'value': '', 'prompt': 'Last name'}]}
+    >>> collection = Collection('...', template=template)
+    >>> collection.template
+    <Template: data=['first_name', 'last_name']>
+    >>> collection.template.first_name
+    <Data: name='first_name' prompt='First name'>
+
+Inspecting items in a collection
+
+.. code-block:: python
+
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "...", "items": [
+    ...     {"href": "...", "data": [
+    ...         {"prompt": "First name", "name": "first_name", "value": "John"},
+    ...         {"prompt": "Last name", "name": "last_name", "value": "Doe"}]},
+    ...     {"href": "...", "data": [
+    ...         {"prompt": "First name", "name": "first_name", "value": "Jane"},
+    ...         {"prompt": "Last name", "name": "last_name", "value": "Doe"}]}]}}'
+    >>> collection = Collection.from_json(data)
+    >>> collection
+    <Collection: version='1.0' href='...'>
+    >>> collection.items
+    [<Item: href='...'>, <Item: href='...'>]
+     >>> collection.items[0].properties
+     ['first_name', 'last_name']
+     >>> collection.items[0].first_name
+     <Data: name='first_name' prompt='First name'>
+     >>> collection.items[0].first_name.value
+     'John'
+     >>> collection.items[0].data
+     [<Data: name='first_name' prompt='First name'>, <Data: name='last_name' prompt='Last name'>]
+     >>> collection.items[0].data[0].name
+     'first_name'
+     >>> collection.items[0].data[0].value
+     'John'

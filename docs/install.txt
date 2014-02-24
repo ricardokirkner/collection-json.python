@@ -1,0 +1,48 @@
+
+Installation
+============
+
+From PyPI
+---------
+::
+
+    $ pip install collection-json
+
+
+From source
+-----------
+
+`collection-json` is being hosted on Github_.
+
+You can clone the master repo: ::
+
+    $ git clone https://github.com/ricardokirkner/collection-json.python.git
+
+Or download one of the following:
+
+* tarball_
+* zipfile_
+
+Once you have the source, you can install it locally by running ::
+
+    $ python setup.py install
+
+.. _Github: https://github.com/ricardokirkner/collection-json.python
+.. _tarball: https://github.com/ricardokirkner/collection-json.python/tarball/master
+.. _zipfile: https://github.com/ricardokirkner/collection-json.python/zipball/master
+
+
+Get the bleeding edge version
+-----------------------------
+
+To get the latest development version of collection-json, run
+::
+
+    $ pip install -U git+https://github.com/ricardokirkner/collection-json.python.git@dev
+
+
+Python
+......
+
+`collection-json` is compatible with Python 2.7 and 3.3.
+

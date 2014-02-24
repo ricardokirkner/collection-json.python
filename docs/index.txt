@@ -6,17 +6,25 @@
 Welcome to collection-json's documentation!
 ===========================================
 
-Contents:
+Release v\ |version|. (:ref:`Changelog`)
+
+`collection-json` is a Python (2 and 3) library for working with Collection+JSON documents.
+
+Guide
+=====
 
 .. toctree::
    :maxdepth: 2
 
+   license
+   install
+   examples
+   api_reference
 
+Project info
+============
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 1
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   changelog
