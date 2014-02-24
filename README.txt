@@ -17,8 +17,10 @@ collection-json is a small library, written in Python, to work with Collection+J
 Installation
 ------------
 
-To install collection-json, simply:
+.. include:: docs/install.txt
 
-.. code-block:: bash
 
-    $ pip install collection-json
+Examples
+--------
+
+.. include:: docs/examples.txt
