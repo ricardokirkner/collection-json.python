@@ -1,3 +1,12 @@
+0.1.0 (2014-02-24): Basics
+--------------------------
+- added basic classes for representing Collection+JSON documents
+- allow querying array items by rel and name attributes
+- attribute lookup on array searches items by name
+- ensure href is a required parameter for collection
+- expose data item names as 'properties' attribute in Item and Template
+- access data items via attribute lookup on item name
+
 0.0.1dev (2014-02-21)
 ---------------------
 - Initial release.

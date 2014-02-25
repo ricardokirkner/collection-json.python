@@ -6,7 +6,7 @@
 Welcome to collection-json's documentation!
 ===========================================
 
-Release v\ |version|. (:ref:`Changelog`)
+Release |version|. (:ref:`Changelog`)
 
 `collection-json` is a Python (2 and 3) library for working with Collection+JSON documents.
 
