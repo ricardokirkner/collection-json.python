@@ -225,7 +225,7 @@ class Array(ComparableObject, list):
         """
         return list(self._matches(name=name, rel=rel))
 
-    def first(self, name=None, rel=None):
+    def get(self, name=None, rel=None):
         """Returns the first item in the array matching name and/or rel.
 
         If both name and rel parameters are provided, item must match
