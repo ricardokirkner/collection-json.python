@@ -201,6 +201,21 @@ class Array(ComparableObject, list):
             results = results[0]
         return results
 
+    def _matches(self, name=None, rel=None):
+        for item in self:
+            item_name = getattr(item, 'name', None)
+            item_rel = getattr(item, 'rel', None)
+
+            if name is not None and item_name == name and rel is None:
+                # only searching by name
+                yield item
+            elif rel is not None and item_rel == rel and name is None:
+                # only searching by rel
+                yield item
+            elif item_name == name and item_rel == rel:
+                # searching by name and rel
+                yield item
+
     def find(self, name=None, rel=None):
         """Return a list of items in the array matching name and/or rel.
 
@@ -208,22 +223,7 @@ class Array(ComparableObject, list):
         both properties.
 
         """
-        results = []
-        for item in self:
-            item_name = getattr(item, 'name', None)
-            item_rel = getattr(item, 'rel', None)
-
-            if name is not None and item_name == name and rel is None:
-                # only searching by name
-                results.append(item)
-            elif rel is not None and item_rel == rel and name is None:
-                # only searching by rel
-                results.append(item)
-            elif item_name == name and item_rel == rel:
-                # searching by name and rel
-                results.append(item)
-
-        return results
+        return list(self._matches(name=name, rel=rel))
 
     def first(self, name=None, rel=None):
         """Returns the first item in the array matching name and/or rel.
@@ -233,18 +233,10 @@ class Array(ComparableObject, list):
 
         If no item is found, raises ValueError.
         """
-        for item in self:
-            item_name = getattr(item, 'name', None)
-            item_rel = getattr(item, 'rel', None)
-
-            if rel and item_rel == rel and name is None:
-                return item
-            elif name and item_name == name and rel is None:
-                return item
-            elif item_name == name and item_rel == rel:
-                return item
-
-        raise ValueError('No matching item found.')
+        try:
+            return next(self._matches(name=name, rel=rel))
+        except StopIteration:
+            raise ValueError('No matching item found.')
 
     def to_dict(self):
         """Return a dictionary representing an Array object."""
