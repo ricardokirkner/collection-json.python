@@ -226,12 +226,13 @@ class Array(ComparableObject, list):
         return list(self._matches(name=name, rel=rel))
 
     def get(self, name=None, rel=None):
-        """Returns the first item in the array matching name and/or rel.
+        """Return the first item in the array matching name and/or rel.
 
-        If both name and rel parameters are provided, item must match
-        both properties.
+        If both name and rel parameters are provided, the returned item must
+        match both properties.
 
         If no item is found, raises ValueError.
+
         """
         try:
             return next(self._matches(name=name, rel=rel))

@@ -750,7 +750,7 @@ class ArrayTestCase(TestCase):
         links = Array(Link, 'links', [link])
         self.assertEqual(links.get(name='bar'), link)
 
-    def test_get_by_multiple(self):
+    def test_get_by_name_multiple(self):
         link1 = Link('href', rel='foo', name='bar')
         link2 = Link('href', rel='foo', name='bar')
         links = Array(Link, 'links', [link1, link2])
