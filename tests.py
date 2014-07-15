@@ -732,6 +732,12 @@ class ArrayTestCase(TestCase):
         links = Array(Link, 'links', [link])
         self.assertEqual(links.get(rel='foo'), link)
 
+    def test_get_by_rel_multiple(self):
+        link1 = Link('href', rel='foo')
+        link2 = Link('href', rel='foo')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.get(rel='foo'), link1)
+
     def test_get_by_rel_not_found(self):
         link = Link('href', rel='foo')
         links = Array(Link, 'links', [link])
@@ -743,6 +749,12 @@ class ArrayTestCase(TestCase):
         link = Link('href', rel='foo', name='bar')
         links = Array(Link, 'links', [link])
         self.assertEqual(links.get(name='bar'), link)
+
+    def test_get_by_multiple(self):
+        link1 = Link('href', rel='foo', name='bar')
+        link2 = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link1, link2])
+        self.assertEqual(links.get(name='bar'), link1)
 
     def test_get_by_name_not_found(self):
         link = Link('href', rel='foo', name='bar')
@@ -760,6 +772,18 @@ class ArrayTestCase(TestCase):
             links.get(rel='bar', name='foo')
 
         self.assertEqual(links.get(rel='foo', name='bar'), foo)
+
+    def test_get_by_rel_and_name_multiple(self):
+        foo1 = Link('href', rel='foo', name='bar')
+        foo2 = Link('href', rel='foo', name='bar')
+        bar = Link('href', rel='bar')
+
+        links = Array(Link, 'links', [foo1, foo2, bar])
+
+        with self.assertRaises(ValueError):
+            links.get(rel='bar', name='foo')
+
+        self.assertEqual(links.get(rel='foo', name='bar'), foo1)
 
     def test_attribute_lookup_by_name(self):
         foo = Link('href', rel='foo', name='bar')
