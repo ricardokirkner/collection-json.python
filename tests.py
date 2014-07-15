@@ -727,6 +727,40 @@ class ArrayTestCase(TestCase):
         self.assertEqual(links.find(rel='foo', name='bar'), [foo])
         self.assertEqual(links.find(rel='bar', name='foo'), [])
 
+    def test_get_by_rel(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.get(rel='foo'), link)
+
+    def test_get_by_rel_not_found(self):
+        link = Link('href', rel='foo')
+        links = Array(Link, 'links', [link])
+
+        with self.assertRaises(ValueError):
+            links.get(rel='bar')
+
+    def test_get_by_name(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+        self.assertEqual(links.get(name='bar'), link)
+
+    def test_get_by_name_not_found(self):
+        link = Link('href', rel='foo', name='bar')
+        links = Array(Link, 'links', [link])
+
+        with self.assertRaises(ValueError):
+            links.get(name='foo')
+
+    def test_get_by_rel_and_name(self):
+        foo = Link('href', rel='foo', name='bar')
+        bar = Link('href', rel='bar')
+        links = Array(Link, 'links', [foo, bar])
+
+        with self.assertRaises(ValueError):
+            links.get(rel='bar', name='foo')
+
+        self.assertEqual(links.get(rel='foo', name='bar'), foo)
+
     def test_attribute_lookup_by_name(self):
         foo = Link('href', rel='foo', name='bar')
         links = Array(Link, 'links', [foo])

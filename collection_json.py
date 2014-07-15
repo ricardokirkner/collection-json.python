@@ -225,6 +225,27 @@ class Array(ComparableObject, list):
 
         return results
 
+    def get(self, name=None, rel=None):
+        """Returns the first item in the array matching name and/or rel.
+
+        If both name and rel parameters are provided, item must match
+        both properties.
+
+        If no item is found, raises ValueError.
+        """
+        for item in self:
+            item_name = getattr(item, 'name', None)
+            item_rel = getattr(item, 'rel', None)
+
+            if rel and item_rel == rel and name is None:
+                return item
+            elif name and item_name == name and rel is None:
+                return item
+            elif item_name == name and item_rel == rel:
+                return item
+
+        raise ValueError('No matching item found.')
+
     def to_dict(self):
         """Return a dictionary representing an Array object."""
         return {
