@@ -78,6 +78,9 @@ class Collection(ComparableObject):
         return "<Collection: version='%s' href='%s'>" % (
             self.version, self.href)
 
+    def __str__(self):
+        return json.dumps(self.to_dict())
+
     def to_dict(self):
         """Return a dictionary representing a Collection object."""
         output = {

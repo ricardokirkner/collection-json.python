@@ -20,6 +20,14 @@ Serialize a Collection object into a dictionary
     >>> collection.to_dict()
     {'collection': {'href': '...', 'version': '1.0'}}
 
+Serialize a Collection object into a json string
+
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
+    >>> collection = Collection.from_json(data)
+    >>> str(collection)
+    '{"collection": {"href": "...", "version": "1.0"}}'
+
 Inspect collection properties
 
 .. code-block:: python

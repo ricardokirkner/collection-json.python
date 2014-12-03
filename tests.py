@@ -320,6 +320,11 @@ class CollectionTestCase(TestCase):
             repr(collection),
             "<Collection: version='1.0' href='href'>")
 
+    def test_str(self):
+        collection = Collection('href')
+        self.assertEqual(str(collection),
+                         '{"collection": {"href": "href", "version": "1.0"}}')
+
 
 class ErrorTestCase(TestCase):
 
