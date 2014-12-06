@@ -322,8 +322,8 @@ class CollectionTestCase(TestCase):
 
     def test_str(self):
         collection = Collection('href')
-        self.assertEqual(str(collection),
-                         '{"collection": {"href": "href", "version": "1.0"}}')
+        expected = json.dumps(collection.to_dict())
+        self.assertEqual(str(collection), expected)
 
 
 class ErrorTestCase(TestCase):
