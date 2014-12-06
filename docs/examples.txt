@@ -17,8 +17,19 @@ Serialize a Collection object into a dictionary
     >>> from collection_json import Collection
     >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
     >>> collection = Collection.from_json(data)
-    >>> collection.to_dict()
-    {'collection': {'href': '...', 'version': '1.0'}}
+    >>> expected = {'collection': {'version': '1.0', 'href': '...'}}
+    >>> collection.to_dict() == expected
+    True
+
+Serialize a Collection object into a json string
+
+    >>> import json
+    >>> from collection_json import Collection
+    >>> data = '{"collection": {"version": "1.0", "href": "..."}}'
+    >>> collection = Collection.from_json(data)
+    >>> expected = json.dumps(collection.to_dict())
+    >>> str(collection) == expected
+    True
 
 Inspect collection properties
 
