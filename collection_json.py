@@ -144,7 +144,8 @@ class Template(ComparableObject):
     def from_json(data):
         """Return a template instance.
 
-        Convenience method for parsing 'write' responses which should only contain a template object.
+        Convenience method for parsing 'write' responses,
+        which should only contain a template object.
 
         This method parses a json string into a Template object.
 
