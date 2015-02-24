@@ -270,7 +270,7 @@ class Item(ComparableObject):
 
     @property
     def properties(self):
-        """Return a list of names that can be looked up on the template."""
+        """Return a list of names that can be looked up on the item."""
         return [item.name for item in self.data]
 
     def to_dict(self):
