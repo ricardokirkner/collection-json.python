@@ -140,6 +140,29 @@ class Template(ComparableObject):
 
     """Object representing a Collection+JSON template object."""
 
+    @staticmethod
+    def from_json(data):
+        """Return a template instance.
+
+        Convenience method for parsing 'write' responses which should only contain the template,
+        not in a collection object.
+
+        This method parses a json string into a Template object.
+
+        Raises `ValueError` when no valid document is provided.
+
+        """
+        try:
+            data = json.loads(data)
+            kwargs = data.get('template')
+            if not kwargs:
+                raise ValueError
+        except ValueError:
+            raise ValueError('Not valid Collection+JSON template data.')
+
+        template = Template(**kwargs)
+        return template
+
     def __init__(self, data=None):
         if data is None:
             data = []
