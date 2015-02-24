@@ -452,6 +452,34 @@ class TemplateTestCase(TestCase):
         template = Template([data])
         self.assertEqual(template.name, data)
 
+    def test_template_from_json_no_error(self):
+        expected = {
+            'template': {
+                'data': [
+                    {'name': 'name', 'value': 'value'},
+                    {'name': 'name1', 'value': 'value1'},
+                ]
+            }
+        }
+        data = json.dumps(expected)
+        template = Template.from_json(data)
+        self.assertEqual(template.to_dict(), expected)
+
+    def test_template_from_json_collection(self):
+        expected = {
+            'collection': {
+                'template': {
+                    'data': [
+                        {'name': 'name', 'value': 'value'},
+                        {'name': 'name1', 'value': 'value1'},
+                    ]
+                }
+            }
+        }
+        data = json.dumps(expected)
+        with self.assertRaises(ValueError):
+            Template.from_json(data)
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
