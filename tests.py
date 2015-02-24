@@ -477,9 +477,8 @@ class TemplateTestCase(TestCase):
             }
         }
         data = json.dumps(expected)
-        with self.assertRaisesRegexp(ValueError, "Not valid Collection\+JSON template data."):
-            template = Template.from_json(data)
-            self.assertFalse(template)
+        with self.assertRaises(ValueError):
+            Template.from_json(data)
 
 
 class ItemTestCase(TestCase):
