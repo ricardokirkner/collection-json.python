@@ -108,3 +108,16 @@ Inspecting items in a collection
      'first_name'
      >>> collection.items[0].data[0].value
      'John'
+
+Serializing a template from json
+
+.. code-block:: python
+
+    >>> from collection_json import Template
+    >>> data = '{"template": {"data": [ {"name": "first_name", "value": "John"}, {"name": "last_name", "value": "Doe}'
+    >>> template = Template.from_json(data)
+    >>> template.first_name.value
+    'John'
+    >>> template.last_name.value
+    'Doe'
+
