@@ -358,10 +358,13 @@ class CollectionTestCase(TestCase):
 
         collection.items = None
         self.assertIsInstance(collection.items, Array)
+        self.assertFalse(collection.items)
         collection.queries = None
         self.assertIsInstance(collection.queries, Array)
+        self.assertFalse(collection.queries)
         collection.links = None
         self.assertIsInstance(collection.links, Array)
+        self.assertFalse(collection.links)
 
 
 class ErrorTestCase(TestCase):
