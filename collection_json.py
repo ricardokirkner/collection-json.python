@@ -6,6 +6,35 @@ import json
 __version__ = '0.1.0'
 
 
+def _from_dict_or_value(value, cls):
+    """Converts the value from dictionary to the specified class or
+    throws an error.
+
+    Value must be either None, dictionary or an instance of cls.
+
+    :param value dict|cls: value to convert
+    :param cls type: class to convert to
+    """
+    if value is None or isinstance(value, cls):
+        return value
+    elif isinstance(value, dict):
+        return cls(**value)
+    raise TypeError("Invalid value '%s', "
+                    "expected dict or '%s'" % (value, cls.__name__))
+
+
+def _from_iterable_to_array(cls, name, iterable=None):
+    """Converts an iterable to an Array of the specified type.
+
+    :param cls type: class to build an array of.
+    :param name str: attribute name
+    :param iterable enumerable: the iterable to convert
+    """
+    if iterable is None:
+        iterable = []
+    return Array(cls, name, iterable)
+
+
 class ComparableObject(object):
 
     """Abstract base class for objects implementing equality comparison.
@@ -54,25 +83,51 @@ class Collection(ComparableObject):
         self.version = version
         self.href = href
 
-        if isinstance(error, dict):
-            error = Error(**error)
         self.error = error
-
-        if isinstance(template, dict):
-            template = Template(**template)
         self.template = template
+        self.items = items
+        self.links = links
+        self.queries = queries
 
-        if items is None:
-            items = []
-        self.items = Array(Item, 'items', items)
+    @property
+    def error(self):
+        return self.__error
 
-        if links is None:
-            links = []
-        self.links = Array(Link, 'links', links)
+    @error.setter
+    def error(self, value):
+        self.__error = _from_dict_or_value(value, Error)
 
-        if queries is None:
-            queries = []
-        self.queries = Array(Query, 'queries', queries)
+    @property
+    def template(self):
+        return self.__template
+
+    @template.setter
+    def template(self, value):
+        self.__template = _from_dict_or_value(value, Template)
+
+    @property
+    def items(self):
+        return self.__items
+
+    @items.setter
+    def items(self, value):
+        self.__items = _from_iterable_to_array(Item, "items", value)
+
+    @property
+    def links(self):
+        return self.__links
+
+    @links.setter
+    def links(self, value):
+        self.__links = _from_iterable_to_array(Link, "links", value)
+
+    @property
+    def queries(self):
+        return self.__queries
+
+    @queries.setter
+    def queries(self, value):
+        self.__queries = _from_iterable_to_array(Query, "queries", value)
 
     def __repr__(self):
         return "<Collection: version='%s' href='%s'>" % (
@@ -164,9 +219,7 @@ class Template(ComparableObject):
         return template
 
     def __init__(self, data=None):
-        if data is None:
-            data = []
-        self.data = Array(Data, 'data', data)
+        self.data = data
 
     def __repr__(self):
         data = [str(item.name) for item in self.data]
@@ -174,6 +227,14 @@ class Template(ComparableObject):
 
     def __getattr__(self, name):
         return getattr(self.data, name)
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = _from_iterable_to_array(Data, "data", value)
 
     @property
     def properties(self):
@@ -278,18 +339,30 @@ class Item(ComparableObject):
 
     def __init__(self, href=None, data=None, links=None):
         self.href = href
-        if data is None:
-            data = []
-        self.data = Array(Data, 'data', data)
-        if links is None:
-            links = []
-        self.links = Array(Link, 'links', links)
+        self.data = data
+        self.links = links
 
     def __repr__(self):
         return "<Item: href='%s'>" % self.href
 
     def __getattr__(self, name):
         return getattr(self.data, name)
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = _from_iterable_to_array(Data, "data", value)
+
+    @property
+    def links(self):
+        return self.__links
+
+    @links.setter
+    def links(self, value):
+        self.__links = _from_iterable_to_array(Link, "links", value)
 
     @property
     def properties(self):
@@ -344,9 +417,7 @@ class Query(ComparableObject):
         self.rel = rel
         self.name = name
         self.prompt = prompt
-        if data is None:
-            data = []
-        self.data = Array(Data, 'data', data)
+        self.data = data
 
     def __repr__(self):
         data = "rel='%s'" % self.rel
@@ -355,6 +426,14 @@ class Query(ComparableObject):
         if self.prompt:
             data += " prompt='%s'" % self.prompt
         return "<Query: %s>" % data
+
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, value):
+        self.__data = _from_iterable_to_array(Data, "data", value)
 
     def to_dict(self):
         """Return a dictionary representing a Query object."""

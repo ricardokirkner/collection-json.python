@@ -325,6 +325,44 @@ class CollectionTestCase(TestCase):
         expected = json.dumps(collection.to_dict())
         self.assertEqual(str(collection), expected)
 
+    def test_property_invalid_assignment(self):
+        collection = Collection('href')
+        invalid_obj = object()
+        with self.assertRaises(TypeError):
+            collection.error = invalid_obj
+
+        with self.assertRaises(TypeError):
+            collection.template = invalid_obj
+
+        with self.assertRaises(TypeError):
+            collection.items = invalid_obj
+
+        with self.assertRaises(TypeError):
+            collection.links = invalid_obj
+
+        with self.assertRaises(TypeError):
+            collection.queries = invalid_obj
+
+    def test_array_property_conversion(self):
+        collection = Collection('href')
+        self.assertIsInstance(collection.items, Array)
+        self.assertIsInstance(collection.queries, Array)
+        self.assertIsInstance(collection.links, Array)
+
+        collection.items = []
+        self.assertIsInstance(collection.items, Array)
+        collection.queries = []
+        self.assertIsInstance(collection.queries, Array)
+        collection.links = []
+        self.assertIsInstance(collection.links, Array)
+
+        collection.items = None
+        self.assertIsInstance(collection.items, Array)
+        collection.queries = None
+        self.assertIsInstance(collection.queries, Array)
+        collection.links = None
+        self.assertIsInstance(collection.links, Array)
+
 
 class ErrorTestCase(TestCase):
 
@@ -480,6 +518,15 @@ class TemplateTestCase(TestCase):
         with self.assertRaises(ValueError):
             Template.from_json(data)
 
+    def test_array_property_conversion(self):
+        template = Template()
+        self.assertIsInstance(template.data, Array)
+        template.data = []
+        self.assertIsInstance(template.data, Array)
+        template.data = None
+        self.assertIsInstance(template.data, Array)
+        self.assertFalse(template.data)
+
 
 class ItemTestCase(TestCase):
     def test_item_minimal(self):
@@ -536,6 +583,21 @@ class ItemTestCase(TestCase):
         data = Data('name')
         item = Item(data=[data])
         self.assertEqual(item.name, data)
+
+    def test_array_property_conversion(self):
+        item = Item()
+        self.assertIsInstance(item.data, Array)
+        self.assertIsInstance(item.links, Array)
+        item.data = []
+        self.assertIsInstance(item.data, Array)
+        item.links = []
+        self.assertIsInstance(item.links, Array)
+        item.data = None
+        self.assertIsInstance(item.data, Array)
+        self.assertFalse(item.data)
+        item.links = None
+        self.assertIsInstance(item.links, Array)
+        self.assertFalse(item.links)
 
 
 class DataTestCase(TestCase):
@@ -637,6 +699,15 @@ class QueryTestCase(TestCase):
             ]
         }
         self.assertEqual(query.to_dict(), expected)
+
+    def test_array_property_conversion(self):
+        query = Query('href', 'rel')
+        self.assertIsInstance(query.data, Array)
+        query.data = []
+        self.assertIsInstance(query.data, Array)
+        query.data = None
+        self.assertIsInstance(query.data, Array)
+        self.assertFalse(query.data)
 
 
 class LinkTestCase(TestCase):
