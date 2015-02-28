@@ -6,33 +6,38 @@ import json
 __version__ = '0.1.0'
 
 
-def _from_dict_or_value(value, cls):
-    """Converts the value from dictionary to the specified class or
-    throws an error.
+class ArrayProperty(object):
+    def __init__(self, cls, name):
+        self.cls = cls
+        self.name = name
+        self.value = None
 
-    Value must be either None, dictionary or an instance of cls.
+    def __get__(self, value, type=None):
+        return self.value
 
-    :param value dict|cls: value to convert
-    :param cls type: class to convert to
-    """
-    if value is None or isinstance(value, cls):
-        return value
-    elif isinstance(value, dict):
-        return cls(**value)
-    raise TypeError("Invalid value '%s', "
-                    "expected dict or '%s'" % (value, cls.__name__))
+    def __set__(self, obj, value):
+        if value is None:
+            value = []
+        self.value = Array(self.cls, self.name, value)
 
 
-def _from_iterable_to_array(cls, name, iterable=None):
-    """Converts an iterable to an Array of the specified type.
+class TypedProperty(object):
+    def __init__(self, cls):
+        self.cls = cls
+        self.value = None
 
-    :param cls type: class to build an array of.
-    :param name str: attribute name
-    :param iterable enumerable: the iterable to convert
-    """
-    if iterable is None:
-        iterable = []
-    return Array(cls, name, iterable)
+    def __get__(self, value, type=None):
+        return self.value
+
+    def __set__(self, obj, value):
+        if value is None or isinstance(value, self.cls):
+            self.value = value
+        elif isinstance(value, dict):
+            self.value = self.cls(**value)
+        else:
+            raise TypeError("Invalid value '%s', "
+                            "expected dict or '%s'" % (value,
+                                                       self.cls.__name__))
 
 
 class ComparableObject(object):
@@ -54,106 +59,66 @@ class ComparableObject(object):
                 self.__dict__ != other.__dict__)
 
 
-class Collection(ComparableObject):
+class Data(ComparableObject):
 
-    """Object representing a Collection+JSON document."""
+    """Object representing a Collection+JSON data object."""
 
-    @staticmethod
-    def from_json(data):
-        """Return a Collection instance.
-
-        This method parses a json string into a Collection object.
-
-        Raises `ValueError` when no valid document is provided.
-
-        """
-        try:
-            data = json.loads(data)
-            kwargs = data.get('collection')
-            if not kwargs:
-                raise ValueError
-        except ValueError:
-            raise ValueError('Not a valid Collection+JSON document.')
-
-        collection = Collection(**kwargs)
-        return collection
-
-    def __init__(self, href, links=None, items=None, queries=None,
-                 template=None, error=None, version='1.0'):
-        self.version = version
-        self.href = href
-
-        self.error = error
-        self.template = template
-        self.items = items
-        self.links = links
-        self.queries = queries
-
-    @property
-    def error(self):
-        return self.__error
-
-    @error.setter
-    def error(self, value):
-        self.__error = _from_dict_or_value(value, Error)
-
-    @property
-    def template(self):
-        return self.__template
-
-    @template.setter
-    def template(self, value):
-        self.__template = _from_dict_or_value(value, Template)
-
-    @property
-    def items(self):
-        return self.__items
-
-    @items.setter
-    def items(self, value):
-        self.__items = _from_iterable_to_array(Item, "items", value)
-
-    @property
-    def links(self):
-        return self.__links
-
-    @links.setter
-    def links(self, value):
-        self.__links = _from_iterable_to_array(Link, "links", value)
-
-    @property
-    def queries(self):
-        return self.__queries
-
-    @queries.setter
-    def queries(self, value):
-        self.__queries = _from_iterable_to_array(Query, "queries", value)
+    def __init__(self, name, value=None, prompt=None):
+        self.name = name
+        self.value = value
+        self.prompt = prompt
 
     def __repr__(self):
-        return "<Collection: version='%s' href='%s'>" % (
-            self.version, self.href)
-
-    def __str__(self):
-        return json.dumps(self.to_dict())
+        data = "name='%s'" % self.name
+        if self.prompt is not None:
+            data += " prompt='%s'" % self.prompt
+        return "<Data: %s>" % data
 
     def to_dict(self):
-        """Return a dictionary representing a Collection object."""
+        """Return a dictionary representing a Data object."""
         output = {
-            'collection': {
-                'version': self.version,
-                'href': self.href,
-            }
+            'name': self.name
         }
-        if self.links:
-            output['collection'].update(self.links.to_dict())
-        if self.items:
-            output['collection'].update(self.items.to_dict())
-        if self.queries:
-            output['collection'].update(self.queries.to_dict())
-        if self.template:
-            output['collection'].update(self.template.to_dict())
-        if self.error:
-            output['collection'].update(self.error.to_dict())
+        if self.value is not None:
+            output['value'] = self.value
+        if self.prompt is not None:
+            output['prompt'] = self.prompt
+        return output
+
+
+class Link(ComparableObject):
+
+    """Object representing a Collection+JSON link object."""
+
+    def __init__(self, href, rel, name=None, render=None, prompt=None):
+        self.href = href
+        self.rel = rel
+        self.name = name
+        self.render = render
+        self.prompt = prompt
+
+    def __repr__(self):
+        data = "rel='%s'" % self.rel
+        if self.name:
+            data += " name='%s'" % self.name
+        if self.render:
+            data += " render='%s'" % self.render
+        if self.prompt:
+            data += " prompt='%s'" % self.prompt
+        return "<Link: %s>" % data
+
+    def to_dict(self):
+        """Return a dictionary representing a Link object."""
+        output = {
+            'href': self.href,
+            'rel': self.rel,
+        }
+        if self.name is not None:
+            output['name'] = self.name
+        if self.render is not None:
+            output['render'] = self.render
+        if self.prompt is not None:
+            output['prompt'] = self.prompt
         return output
 
 
@@ -195,6 +160,8 @@ class Template(ComparableObject):
 
     """Object representing a Collection+JSON template object."""
 
+    data = ArrayProperty(Data, "data")
+
     @staticmethod
     def from_json(data):
         """Return a template instance.
@@ -227,14 +194,6 @@ class Template(ComparableObject):
 
     def __getattr__(self, name):
         return getattr(self.data, name)
-
-    @property
-    def data(self):
-        return self.__data
-
-    @data.setter
-    def data(self, value):
-        self.__data = _from_iterable_to_array(Data, "data", value)
 
     @property
     def properties(self):
@@ -337,6 +296,9 @@ class Item(ComparableObject):
 
     """Object representing a Collection+JSON item object."""
 
+    data = ArrayProperty(Data, "data")
+    links = ArrayProperty(Link, "links")
+
     def __init__(self, href=None, data=None, links=None):
         self.href = href
         self.data = data
@@ -347,22 +309,6 @@ class Item(ComparableObject):
 
     def __getattr__(self, name):
         return getattr(self.data, name)
-
-    @property
-    def data(self):
-        return self.__data
-
-    @data.setter
-    def data(self, value):
-        self.__data = _from_iterable_to_array(Data, "data", value)
-
-    @property
-    def links(self):
-        return self.__links
-
-    @links.setter
-    def links(self, value):
-        self.__links = _from_iterable_to_array(Link, "links", value)
 
     @property
     def properties(self):
@@ -381,36 +327,11 @@ class Item(ComparableObject):
         return output
 
 
-class Data(ComparableObject):
-
-    """Object representing a Collection+JSON data object."""
-
-    def __init__(self, name, value=None, prompt=None):
-        self.name = name
-        self.value = value
-        self.prompt = prompt
-
-    def __repr__(self):
-        data = "name='%s'" % self.name
-        if self.prompt is not None:
-            data += " prompt='%s'" % self.prompt
-        return "<Data: %s>" % data
-
-    def to_dict(self):
-        """Return a dictionary representing a Data object."""
-        output = {
-            'name': self.name
-        }
-        if self.value is not None:
-            output['value'] = self.value
-        if self.prompt is not None:
-            output['prompt'] = self.prompt
-        return output
-
-
 class Query(ComparableObject):
 
     """Object representing a Collection+JSON query object."""
+
+    data = ArrayProperty(Data, "data")
 
     def __init__(self, href, rel, name=None, prompt=None, data=None):
         self.href = href
@@ -427,14 +348,6 @@ class Query(ComparableObject):
             data += " prompt='%s'" % self.prompt
         return "<Query: %s>" % data
 
-    @property
-    def data(self):
-        return self.__data
-
-    @data.setter
-    def data(self, value):
-        self.__data = _from_iterable_to_array(Data, "data", value)
-
     def to_dict(self):
         """Return a dictionary representing a Query object."""
         output = {
@@ -450,37 +363,70 @@ class Query(ComparableObject):
         return output
 
 
-class Link(ComparableObject):
+class Collection(ComparableObject):
 
-    """Object representing a Collection+JSON link object."""
+    """Object representing a Collection+JSON document."""
 
-    def __init__(self, href, rel, name=None, render=None, prompt=None):
+    error = TypedProperty(Error)
+    template = TypedProperty(Template)
+    items = ArrayProperty(Item, "items")
+    links = ArrayProperty(Link, "links")
+    queries = ArrayProperty(Query, "queries")
+
+    @staticmethod
+    def from_json(data):
+        """Return a Collection instance.
+
+        This method parses a json string into a Collection object.
+
+        Raises `ValueError` when no valid document is provided.
+
+        """
+        try:
+            data = json.loads(data)
+            kwargs = data.get('collection')
+            if not kwargs:
+                raise ValueError
+        except ValueError:
+            raise ValueError('Not a valid Collection+JSON document.')
+
+        collection = Collection(**kwargs)
+        return collection
+
+    def __init__(self, href, links=None, items=None, queries=None,
+                 template=None, error=None, version='1.0'):
+        self.version = version
         self.href = href
-        self.rel = rel
-        self.name = name
-        self.render = render
-        self.prompt = prompt
+
+        self.error = error
+        self.template = template
+        self.items = items
+        self.links = links
+        self.queries = queries
 
     def __repr__(self):
-        data = "rel='%s'" % self.rel
-        if self.name:
-            data += " name='%s'" % self.name
-        if self.render:
-            data += " render='%s'" % self.render
-        if self.prompt:
-            data += " prompt='%s'" % self.prompt
-        return "<Link: %s>" % data
+        return "<Collection: version='%s' href='%s'>" % (
+            self.version, self.href)
+
+    def __str__(self):
+        return json.dumps(self.to_dict())
 
     def to_dict(self):
-        """Return a dictionary representing a Link object."""
+        """Return a dictionary representing a Collection object."""
         output = {
-            'href': self.href,
-            'rel': self.rel,
+            'collection': {
+                'version': self.version,
+                'href': self.href,
+            }
         }
-        if self.name is not None:
-            output['name'] = self.name
-        if self.render is not None:
-            output['render'] = self.render
-        if self.prompt is not None:
-            output['prompt'] = self.prompt
+        if self.links:
+            output['collection'].update(self.links.to_dict())
+        if self.items:
+            output['collection'].update(self.items.to_dict())
+        if self.queries:
+            output['collection'].update(self.queries.to_dict())
+        if self.template:
+            output['collection'].update(self.template.to_dict())
+        if self.error:
+            output['collection'].update(self.error.to_dict())
         return output
