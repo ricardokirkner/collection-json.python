@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from collection_json import (
     Array,
+    ArrayProperty,
     Collection,
     Data,
     Error,
@@ -11,7 +12,6 @@ from collection_json import (
     Link,
     Query,
     Template,
-    ArrayProperty,
     TypedProperty
 )
 
