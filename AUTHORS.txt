@@ -1,0 +1,13 @@
+collection-json is written and maintained by Ricardo Kirkner and various contributors.
+
+Development Lead
+----------------
+
+- Ricardo Kirkner <ricardo@kirkner.com.ar> (`@ricardokirkner <https://github.com/ricardokirkner>`_)
+
+
+Contributors
+------------
+
+- Chris Marinos (`@ChrisMarinos <https://github.com/ChrisMarinos>`_)
+- Daniel DeSousa (`@dandesousa <https://github.com/dandesousa>`_)
