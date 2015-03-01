@@ -18,15 +18,15 @@ class ArrayProperty(object):
         """
         self.cls = cls
         self.name = name
-        self.value = None
+        self.value_attr = "_" + name
 
-    def __get__(self, value, type=None):
-        return self.value
+    def __get__(self, instance, owner):
+        return getattr(instance, self.value_attr, None)
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if value is None:
             value = []
-        self.value = Array(self.cls, self.name, value)
+        setattr(instance, self.value_attr, Array(self.cls, self.name, value))
 
 
 class TypedProperty(object):
@@ -37,22 +37,22 @@ class TypedProperty(object):
 
     """
 
-    def __init__(self, cls):
+    def __init__(self, cls, name):
         """Constructs the typed property
 
         :param cls type: the type of object expected
         """
         self.cls = cls
-        self.value = None
+        self.value_attr = "_" + name
 
-    def __get__(self, value, type=None):
-        return self.value
+    def __get__(self, instance, owner):
+        return getattr(instance, self.value_attr, None)
 
-    def __set__(self, obj, value):
+    def __set__(self, instance, value):
         if value is None or isinstance(value, self.cls):
-            self.value = value
+            setattr(instance, self.value_attr, value)
         elif isinstance(value, dict):
-            self.value = self.cls(**value)
+            setattr(instance, self.value_attr, self.cls(**value))
         else:
             raise TypeError("Invalid value '%s', "
                             "expected dict or '%s'" % (value,
@@ -386,8 +386,8 @@ class Collection(ComparableObject):
 
     """Object representing a Collection+JSON document."""
 
-    error = TypedProperty(Error)
-    template = TypedProperty(Template)
+    error = TypedProperty(Error, "error")
+    template = TypedProperty(Template, "template")
     items = ArrayProperty(Item, "items")
     links = ArrayProperty(Link, "links")
     queries = ArrayProperty(Query, "queries")

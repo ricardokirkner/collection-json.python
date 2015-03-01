@@ -11,6 +11,8 @@ from collection_json import (
     Link,
     Query,
     Template,
+    ArrayProperty,
+    TypedProperty
 )
 
 
@@ -959,3 +961,29 @@ class ArrayTestCase(TestCase):
         bar = Link('href2', rel='baz', name='foo')
         links = Array(Link, 'links', [foo, bar])
         self.assertEqual(links.foo, [foo, bar])
+
+
+class ArrayPropertyTestCase(TestCase):
+
+    class Simple(object):
+        aprop = ArrayProperty(int, "aprop")
+
+    def test_instance_independence(self):
+        s1 = ArrayPropertyTestCase.Simple()
+        s2 = ArrayPropertyTestCase.Simple()
+        s1.aprop = [1, 2, 3]
+        s2.aprop = [1, 2]
+        self.assertNotEqual(s1.aprop, s2.aprop)
+
+
+class TypedPropertyTestCase(TestCase):
+
+    class Simple(object):
+        tprop = TypedProperty(int, "tprop")
+
+    def test_instance_independence(self):
+        s1 = TypedPropertyTestCase.Simple()
+        s2 = TypedPropertyTestCase.Simple()
+        s1.aprop = 1
+        s2.aprop = 2
+        self.assertNotEqual(s1.aprop, s2.aprop)
