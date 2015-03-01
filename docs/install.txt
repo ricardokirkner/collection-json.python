@@ -44,5 +44,5 @@ To get the latest development version of collection-json, run
 Python
 ......
 
-`collection-json` is compatible with Python 2.7 and 3.3.
+`collection-json` is compatible with Python 2.7, 3.3 and 3.4.
 
