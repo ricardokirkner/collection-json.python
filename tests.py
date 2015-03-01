@@ -325,46 +325,75 @@ class CollectionTestCase(TestCase):
         expected = json.dumps(collection.to_dict())
         self.assertEqual(str(collection), expected)
 
-    def test_property_invalid_assignment(self):
+    def test_set_error_invalid(self):
         collection = Collection('href')
         invalid_obj = object()
         with self.assertRaises(TypeError):
             collection.error = invalid_obj
 
+    def test_set_template_invalid(self):
+        collection = Collection('href')
+        invalid_obj = object()
         with self.assertRaises(TypeError):
             collection.template = invalid_obj
 
+    def test_set_items_invalid(self):
+        collection = Collection('href')
+        invalid_obj = object()
         with self.assertRaises(TypeError):
             collection.items = invalid_obj
 
+    def test_set_links_invalid(self):
+        collection = Collection('href')
+        invalid_obj = object()
         with self.assertRaises(TypeError):
             collection.links = invalid_obj
 
+    def test_set_queries_invalid(self):
+        collection = Collection('href')
+        invalid_obj = object()
         with self.assertRaises(TypeError):
             collection.queries = invalid_obj
 
-    def test_array_property_conversion(self):
+    def test_set_error(self):
+        error = Error()
+        expected = Collection('href', error=error)
         collection = Collection('href')
-        self.assertIsInstance(collection.items, Array)
-        self.assertIsInstance(collection.queries, Array)
-        self.assertIsInstance(collection.links, Array)
+        collection.error = error
+        self.assertIsInstance(collection.error, Error)
+        self.assertEqual(collection, expected)
 
-        collection.items = []
-        self.assertIsInstance(collection.items, Array)
-        collection.queries = []
-        self.assertIsInstance(collection.queries, Array)
-        collection.links = []
-        self.assertIsInstance(collection.links, Array)
+    def test_set_template(self):
+        template = Template()
+        expected = Collection('href', template=template)
+        collection = Collection('href')
+        collection.template = template
+        self.assertIsInstance(collection.template, Template)
+        self.assertEqual(collection, expected)
 
-        collection.items = None
+    def test_set_items(self):
+        item = Item()
+        expected = Collection('href', items=[item])
+        collection = Collection('href')
+        collection.items = [item]
         self.assertIsInstance(collection.items, Array)
-        self.assertFalse(collection.items)
-        collection.queries = None
-        self.assertIsInstance(collection.queries, Array)
-        self.assertFalse(collection.queries)
-        collection.links = None
+        self.assertEqual(collection, expected)
+
+    def test_set_links(self):
+        link = Link('href', 'rel')
+        expected = Collection('href', links=[link])
+        collection = Collection('href')
+        collection.links = [link]
         self.assertIsInstance(collection.links, Array)
-        self.assertFalse(collection.links)
+        self.assertEqual(collection, expected)
+
+    def test_set_queries(self):
+        query = Query('href', 'rel')
+        expected = Collection('href', queries=[query])
+        collection = Collection('href')
+        collection.queries = [query]
+        self.assertIsInstance(collection.queries, Array)
+        self.assertEqual(collection, expected)
 
 
 class ErrorTestCase(TestCase):
@@ -521,14 +550,19 @@ class TemplateTestCase(TestCase):
         with self.assertRaises(ValueError):
             Template.from_json(data)
 
-    def test_array_property_conversion(self):
+    def test_set_data_invalid(self):
         template = Template()
+        invalid_obj = object()
+        with self.assertRaises(TypeError):
+            template.data = invalid_obj
+
+    def test_set_data(self):
+        data = Data('name')
+        expected = Template(data=[data])
+        template = Template()
+        template.data = [data]
         self.assertIsInstance(template.data, Array)
-        template.data = []
-        self.assertIsInstance(template.data, Array)
-        template.data = None
-        self.assertIsInstance(template.data, Array)
-        self.assertFalse(template.data)
+        self.assertEqual(template, expected)
 
 
 class ItemTestCase(TestCase):
@@ -587,20 +621,33 @@ class ItemTestCase(TestCase):
         item = Item(data=[data])
         self.assertEqual(item.name, data)
 
-    def test_array_property_conversion(self):
+    def test_set_data_invalid(self):
         item = Item()
+        invalid_obj = object()
+        with self.assertRaises(TypeError):
+            item.data = invalid_obj
+
+    def test_set_links_invalid(self):
+        item = Item()
+        invalid_obj = object()
+        with self.assertRaises(TypeError):
+            item.links = invalid_obj
+
+    def test_set_data(self):
+        data = Data('name')
+        expected = Item(data=[data])
+        item = Item()
+        item.data = [data]
         self.assertIsInstance(item.data, Array)
+        self.assertEqual(item, expected)
+
+    def test_set_links(self):
+        link = Link('rel', 'href')
+        expected = Item(links=[link])
+        item = Item()
+        item.links = [link]
         self.assertIsInstance(item.links, Array)
-        item.data = []
-        self.assertIsInstance(item.data, Array)
-        item.links = []
-        self.assertIsInstance(item.links, Array)
-        item.data = None
-        self.assertIsInstance(item.data, Array)
-        self.assertFalse(item.data)
-        item.links = None
-        self.assertIsInstance(item.links, Array)
-        self.assertFalse(item.links)
+        self.assertEqual(item, expected)
 
 
 class DataTestCase(TestCase):
@@ -703,14 +750,19 @@ class QueryTestCase(TestCase):
         }
         self.assertEqual(query.to_dict(), expected)
 
-    def test_array_property_conversion(self):
+    def test_set_data_invalid(self):
         query = Query('href', 'rel')
+        invalid_obj = object()
+        with self.assertRaises(TypeError):
+            query.data = invalid_obj
+
+    def test_set_data(self):
+        data = Data('name')
+        expected = Query('href', 'rel', data=[data])
+        query = Query('href', 'rel')
+        query.data = [data]
         self.assertIsInstance(query.data, Array)
-        query.data = []
-        self.assertIsInstance(query.data, Array)
-        query.data = None
-        self.assertIsInstance(query.data, Array)
-        self.assertFalse(query.data)
+        self.assertEqual(query, expected)
 
 
 class LinkTestCase(TestCase):
