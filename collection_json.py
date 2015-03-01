@@ -7,7 +7,15 @@ __version__ = '0.1.0'
 
 
 class ArrayProperty(object):
+
+    """Property which converts from any enumerable to a typed Array instance."""
+
     def __init__(self, cls, name):
+        """Constructs typed array property
+
+        :param cls type: the type of objects expected in the array
+        :param name str: name of the property
+        """
         self.cls = cls
         self.name = name
         self.value = None
@@ -22,7 +30,18 @@ class ArrayProperty(object):
 
 
 class TypedProperty(object):
+
+    """Property which is assignable only to a specific type of instance.
+
+    Additionally supports assigning a dictionary convertable to the type.
+
+    """
+
     def __init__(self, cls):
+        """Constructs the typed property
+
+        :param cls type: the type of object expected
+        """
         self.cls = cls
         self.value = None
 

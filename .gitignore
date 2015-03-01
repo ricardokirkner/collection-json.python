@@ -5,3 +5,4 @@ collection_json.egg-info/
 dist/
 .coverage
 docs/_build/
+.DS_Store
