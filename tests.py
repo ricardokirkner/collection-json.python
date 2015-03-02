@@ -975,6 +975,11 @@ class ArrayPropertyTestCase(TestCase):
         s2.aprop = [1, 2]
         self.assertNotEqual(s1.aprop, s2.aprop)
 
+    def test_attribute_error(self):
+        s1 = ArrayPropertyTestCase.Simple()
+        with self.assertRaises(AttributeError):
+            s1.aprop
+
 
 class TypedPropertyTestCase(TestCase):
 
@@ -984,6 +989,11 @@ class TypedPropertyTestCase(TestCase):
     def test_instance_independence(self):
         s1 = TypedPropertyTestCase.Simple()
         s2 = TypedPropertyTestCase.Simple()
-        s1.aprop = 1
-        s2.aprop = 2
-        self.assertNotEqual(s1.aprop, s2.aprop)
+        s1.tprop = 1
+        s2.tprop = 2
+        self.assertNotEqual(s1.tprop, s2.tprop)
+
+    def test_attribute_error(self):
+        s1 = TypedPropertyTestCase.Simple()
+        with self.assertRaises(AttributeError):
+            s1.tprop
