@@ -8,7 +8,7 @@ __version__ = '0.1.0'
 
 class ArrayProperty(object):
 
-    """Property which converts from any enumerable to a typed Array instance."""
+    """A descriptor that converts from any enumerable to a typed Array."""
 
     def __init__(self, cls, name):
         """Constructs typed array property
@@ -18,20 +18,21 @@ class ArrayProperty(object):
         """
         self.cls = cls
         self.name = name
-        self.value_attr = "_" + name
 
     def __get__(self, instance, owner):
-        return getattr(instance, self.value_attr, None)
+        if self.name in instance.__dict__:
+            return instance.__dict__[self.name]
+        raise AttributeError
 
     def __set__(self, instance, value):
         if value is None:
             value = []
-        setattr(instance, self.value_attr, Array(self.cls, self.name, value))
+        instance.__dict__[self.name] = Array(self.cls, self.name, value)
 
 
 class TypedProperty(object):
 
-    """Property which is assignable only to a specific type of instance.
+    """A descriptor for assigning only a specific type of instance.
 
     Additionally supports assigning a dictionary convertable to the type.
 
@@ -43,16 +44,18 @@ class TypedProperty(object):
         :param cls type: the type of object expected
         """
         self.cls = cls
-        self.value_attr = "_" + name
+        self.name = name
 
     def __get__(self, instance, owner):
-        return getattr(instance, self.value_attr, None)
+        if self.name in instance.__dict__:
+            return instance.__dict__[self.name]
+        raise AttributeError
 
     def __set__(self, instance, value):
         if value is None or isinstance(value, self.cls):
-            setattr(instance, self.value_attr, value)
+            instance.__dict__[self.name] = value
         elif isinstance(value, dict):
-            setattr(instance, self.value_attr, self.cls(**value))
+            instance.__dict__[self.name] = self.cls(**value)
         else:
             raise TypeError("Invalid value '%s', "
                             "expected dict or '%s'" % (value,
