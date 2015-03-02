@@ -365,11 +365,27 @@ class CollectionTestCase(TestCase):
         self.assertIsInstance(collection.error, Error)
         self.assertEqual(collection, expected)
 
+    def test_set_error_dict(self):
+        error = Error(code=1, title="title", message="message")
+        expected = Collection('href', error=error)
+        collection = Collection('href')
+        collection.error = error.to_dict()["error"]
+        self.assertIsInstance(collection.error, Error)
+        self.assertEqual(collection, expected)
+
     def test_set_template(self):
         template = Template()
         expected = Collection('href', template=template)
         collection = Collection('href')
         collection.template = template
+        self.assertIsInstance(collection.template, Template)
+        self.assertEqual(collection, expected)
+
+    def test_set_template_dict(self):
+        template = Template(data=[Data("name")])
+        expected = Collection('href', template=template)
+        collection = Collection('href')
+        collection.template = template.to_dict()["template"]
         self.assertIsInstance(collection.template, Template)
         self.assertEqual(collection, expected)
 
