@@ -1,3 +1,13 @@
+.. :changelog:
+
+0.1.1 (2015-03-03): Usability
+-----------------------------
+- cast value to the right type when setting arrays
+  (items, links, queries, data) and typed values (error, template)
+- added support for Template to load from json
+- support serializing Collection directly as string
+- added helper for returning the first match in an array
+
 0.1.0 (2014-02-24): Basics
 --------------------------
 - added basic classes for representing Collection+JSON documents
