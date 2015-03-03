@@ -996,6 +996,10 @@ class ArrayPropertyTestCase(TestCase):
         with self.assertRaises(AttributeError):
             s1.aprop
 
+    def test_get_without_instance(self):
+        self.assertTrue(isinstance(ArrayPropertyTestCase.Simple.aprop,
+                                   ArrayProperty))
+
 
 class TypedPropertyTestCase(TestCase):
 
@@ -1013,3 +1017,7 @@ class TypedPropertyTestCase(TestCase):
         s1 = TypedPropertyTestCase.Simple()
         with self.assertRaises(AttributeError):
             s1.tprop
+
+    def test_get_without_instance(self):
+        self.assertTrue(isinstance(TypedPropertyTestCase.Simple.tprop,
+                                   TypedProperty))

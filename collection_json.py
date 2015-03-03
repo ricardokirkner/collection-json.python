@@ -20,8 +20,11 @@ class ArrayProperty(object):
         self.name = name
 
     def __get__(self, instance, owner):
-        if self.name in instance.__dict__:
-            return instance.__dict__[self.name]
+        target = instance
+        if target is None:
+            target = owner
+        if self.name in target.__dict__:
+            return target.__dict__[self.name]
         raise AttributeError
 
     def __set__(self, instance, value):
@@ -47,8 +50,11 @@ class TypedProperty(object):
         self.name = name
 
     def __get__(self, instance, owner):
-        if self.name in instance.__dict__:
-            return instance.__dict__[self.name]
+        target = instance
+        if target is None:
+            target = owner
+        if self.name in target.__dict__:
+            return target.__dict__[self.name]
         raise AttributeError
 
     def __set__(self, instance, value):
